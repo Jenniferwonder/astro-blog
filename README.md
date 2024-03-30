@@ -1,47 +1,131 @@
-# Astro Starter Kit: Minimal
+### Why
 
-```sh
-npm create astro@latest -- --template minimal
-```
+- Fastest client-side app
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/minimal)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/minimal)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/minimal/devcontainer.json)
+### Reference
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+- [Astro Doc](https://docs.astro.build)
 
-## 🚀 Project Structure
+### Dependency
 
-Inside of your Astro project, you'll see the following folders and files:
+- astro 4.4.9
+- create RSS feed
+  - `npm install @astrojs/rss`
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+### Tools
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+- VS Code Extension
+  - astro
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+### Reuse Components
 
-Any static assets, like images, can be placed in the `public/` directory.
+> `src/components`
 
-## 🧞 Commands
+#### Astro Components (SSR)
 
-All commands are run from the root of the project, from a terminal:
+- To hold `.astro` files that will generate HTML but that will not become new pages on your website
+- JS in Astro Components
+  - JS in HTML template: Curly braces are necessary
+  - JS in frontmatter
+    - The Astro frontmatter script contains only JavaScript.
+  - ✅ Use
+    - Defining your page title and heading dynamically
+    - Mapping through a list of skills on the About page
+    - Conditionally displaying HTML elements
+  - ❌ Not for client-side interaction
+    - Executed at build time to create static HTML for your site, and then the code is “thrown away.”
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+#### Client Side Interaction (CSR)
 
-## 👀 Want to learn more?
+> 📺Sent to the browser, and is available to run, based on user interactions like refreshing a page or toggling an input
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+##### Framework Components
+
+- Astro Island
+  - 📺 a *hydrated* component (UI Framework component)
+  - include `client:` to send the JavaScript to the client at a different time
+  - allow you to “try out” a new framework without requiring you to start an entirely new project using that tech stack
+  - allow you to reuse code you have written in other frameworks and you can often just drop them right into your site.
+  - `client:load`
+  - `client:visible`
+    - will only send the component’s JavaScript when it is visible on the page
+
+##### JS in HTML `<script>` tag
+
+- import from `./src/scripts`
+
+### Create Layouts
+
+> `src/layouts`
+
+- In HTML template, add `<slot />`
+  - Pass content to your layouts
+- Pass data from Markdown frontmatter to your layouts
+  - `const {pageTitle} = Astro.props`
+  - Then use `{pageTitle}` in HTML template
+- Nest two layouts
+
+### Astro API
+
+- ✅ access data from files in your project
+  - In frontmatter
+    - `const allPosts = await Astro.glob('../pages/posts/*.md');`
+      - will return an array of objects, one for each blog post
+  - Then in HTML template
+    - `{allPosts.map((post)=><BlogPost url={post.url} title={post.frontmatter.title}/>)}`
+- ✅ create multiple pages (routes) from one file
+  - `[tag].astro`
+  - `getStaticPaths(... return {params: {tag}, props:{posts: ...}})`
+    - `const {tag} = Astro.params`
+    - `const {posts} = Astro.props`
+
+### Styles
+
+> `src/styles`
+
+- global style
+  - `src/styles/global.css`
+- page style
+  - In HTML `<style>` to style individual page
+  - When in conflict, page style will overwrite global style
+
+#### Tailwind in Astro
+
+`npx astro add tailwind`
+
+### Pages Routing
+
+> `src/pages`
+
+- `pages/folder/index.astro` routing feature
+  - a page at the same route: `pages/folder.astro`
+
+### Content Collection
+
+> `src/content`
+
+#### Why
+
+allow you to use more powerful and performant APIs to generate your blog post index and display your individual blog posts  
+ you will have a **[schema](https://docs.astro.build/en/guides/content-collections/#defining-a-collection-schema)** to define a common structure for each post that Astro will help you enforce
+
+- can specify when frontmatter properties are required
+- which data type each property must be, such as a string or an array
+
+#### Use
+
+convert a basic blog from `src/pages/posts/` to `src/content/posts/`
+
+##### Generate pages from a collection
+
+Your Markdown and MDX files no longer automatically become pages using Astro's file-based routing when they are inside a collection, so you must create a page responsible for generating each individual blog post
+
+### Transition Animation
+
+> [Tutorial - Extend with View Transitions | Docs](https://docs.astro.build/en/tutorials/add-view-transitions/)
+
+To change the type of animation for a single element, add the `transition:animate=""` directive
+
+#### Override transition animation (force a full browser reload)
+
+`<a href="/about/" data-astro-reload>About</a>`
